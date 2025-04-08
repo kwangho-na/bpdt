@@ -10,13 +10,14 @@
 	}
 	
 	setEvent() {
+		arr=null
+		target = null
 		switch(args().size()) {
 		case 2: args(eventName, fc)
 		case 3: args(target,eventName,fc)
 		case 4: args(target,eventName,fc,parent)
 		}
 		not(target) target = this
-		arr=null
 		fn=target.get(eventName)
 		if( typeof(fn,'func')) {
 			arr=fn.eventFuncList()
@@ -25,8 +26,9 @@
 		if( fcType.eq('bool') ) {
 			if( fcType && arr) {
 				print("@@ setEvent $eventName 함수를 초기화 했습니다")
-				arr.reuse()
+				target.set(eventName, null)
 			}
+			arr.reuse()
 			return arr;
 		}
 		not( fcType.eq('funcRef') ) {		
