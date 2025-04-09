@@ -1,21 +1,59 @@
 <script>
 	cmd(name) {
 		not(name) name='cmd'
-		obj = object("process.$name")
+		obj = _node("process.$name")
 		if(obj.var(useModule)) {
 			return obj;
 		}
-		return addModule(obj, '@cmd', "cmd")
+		return addModule(obj, '@cmd', name)
+	}
+	web(name) {
+		not(name) name='common'
+		obj = _node("web.$name")
+		if(obj.var(useModule)) {
+			return obj;
+		}
+		return addModule(obj, '@web', name)
+	}
+</script>
+
+<script module="@web">
+	init(name) {
+		@web = Baro.web(name)
+		setCallback(web, this.webProc, this)
+	}
+	callUrl(url) {
+		this.set('resultData','')
+		web.call(url)
+	}
+	postData(data) {
+		web.set("data", data)
+	}
+	setHeader(k,v) {
+		h = web.addNode("@header")
+		h.set(k,v)
+	}
+	webProc(type, data ) {
+		if(type.eq('read')) return this.appendText('resultData', data)
+		if(type.eq('finish')) {
+			if( typeof(this.finishFunc,'func')) {
+				this.finishFunc(this.ref('resultData'))
+			}
+		}
+	}
+	setFinish(fc) {
+		this.finishFunc = fc
 	}
 </script>
 
 <script module="@cmd">
-	init(proc) {
-		@proc=proc;
+	init(name) {
+		@proc=Baro.process(name)
 		@cmdList=this.addArray("cmd.list");
 		@status = 'stay'
 		@currentProgram = 'cmd'
-		setCallback(this.cmdProc)
+		this.runStartTick = System.localtime()
+		setCallback(proc, this.cmdProc, this)
 		this.start()
 	}
 	isRun() {
@@ -34,6 +72,7 @@
 			prog=this.member(currentProgram)
 		}
 		proc.run(prog, 0x400)
+		this.run('chcp 65001')
 	}
 	startPowershell() {
 		this.start("powershell")
@@ -59,10 +98,15 @@
 		not(cmd) cmd=cmdList.pop()
 		if(cmd) {
 			@status = 'start'
+			this.runStartTick = System.localtime()
 			this.set('cmdResult','')
 			proc.write(cmd);
 		} else {
-			@status = 'stay'
+			dist = System.localtime() - this.runStartTick
+			print("run time == $dist")
+			if( dist > 5 ) {
+				print("모든 명령을 실행 했습니다")
+			}
 		}
 	}
 	cmdProc(type,data) {
@@ -70,6 +114,7 @@
 			this.appendText('cmdResult', data);
 			c=data.ch(-1,true);
 			if(c=='>') {
+				@status = 'stay'
 				this.parseResult();
 				this.run()
 			}
@@ -81,6 +126,7 @@
 	}
 	parseResult() {
 		result = this.get('cmdResult')
+		print("cmd>> $result")
 		logWriter('cmd').appendLog(result)
 	}
 </script>

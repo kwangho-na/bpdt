@@ -2,54 +2,108 @@
 공통 객체처리 함수
 */
 <script>
-	setCallback(fc, target) {
-		not(target) target = this
-		not(typeof(fc,'func')) return print('setCallback 함수소스 오류') 
-		not(typeof(target,'node')) return print('setCallback this 오류', fc) 
-		target.set('@callback', Cf.funcNode(fc,target))
-	}
-	
-	setEvent() {
-		arr=null
-		target = null
-		switch(args().size()) {
-		case 2: args(eventName, fc)
-		case 3: args(target,eventName,fc)
-		case 4: args(target,eventName,fc,parent)
+	setCallback(obj, fc, target) {
+		if(typeof(obj,'func')) {
+			if(typeof(fc,'node')) {
+				temp = obj
+				obj = fc
+				fc = temp
+			} else {
+				fc = obj
+				obj = this
+			}
 		}
-		not(target) target = this
-		fn=target.get(eventName)
+		not(obj) obj = this
+		not(typeof(obj,'node')) return print('setCallback 객체 오류', obj, fc) 
+		not(typeof(target,'node')) {
+			target = obj
+		}
+		arr = null
+		fn = obj.get('@callback')
 		if( typeof(fn,'func')) {
 			arr=fn.eventFuncList()
 		}
 		fcType=typeof(fc)
 		if( fcType.eq('bool') ) {
-			if( fcType && arr) {
+			if( fcType && arr ) {
 				print("@@ setEvent $eventName 함수를 초기화 했습니다")
-				target.set(eventName, null)
+				obj.set('@callback', null)
+				arr.reuse()
 			}
-			arr.reuse()
 			return arr;
 		}
 		not( fcType.eq('funcRef') ) {		
-			if(fc) print("setEvent $fcType 함수가 아닙니다")
+			if(fc) print("setCallback 함수타입 오류 (타입:$fcType)")
 			return;
 		}
 		not( typeof(arr,'array') ) {
 			fn=Cf.funcNode(@event.eventChildFunc, target)
-			target.set(eventName, fn)
-		}
-		not(typeof(fn,'func')) return print('setEvent 등록오류 ', eventName)
-		if( parent ) {
-			if(target!=parent) {
-				fn.set("@this",parent)
-				fn.set("sender",target)
+			obj.set('@callback', fn)
+			if( obj!=target ) {
+				fn.set('@this', target)
+				fn.set("sender", obj)
 			}
 		}
+		not(typeof(fn,'func')) {
+			return print('setCallback 등록오류 ')
+		}
+		
 		if(arr.find(fc)) {
 			print("@@ setEvent ${target.tag} ${eventName} 이미 추가된 함수")
 		} else {
 			print("@@ setEvent ${target.tag} ${eventName} 이벤트함수 추가")
+			fn.addFuncSrc(fc)
+		}
+		return fn;		
+	}
+	
+	setEvent() {
+		arr=null
+		obj = null
+		target = null
+		switch(args().size()) {
+		case 2: args(eventName, fc)
+		case 3: args(obj,eventName,fc)
+		case 4: args(obj,eventName,fc,target)
+		}
+		not(obj) obj = this
+		not(typeof(obj,'node')) return print('setEvent 객체 오류', obj, fc) 
+		not(typeof(target,'node')) {
+			target = obj
+		}
+		fn=obj.get(eventName)
+		if( typeof(fn,'func')) {
+			arr=fn.eventFuncList()
+		}
+		fcType=typeof(fc)
+		if( fcType.eq('bool') ) {
+			if( fcType && arr ) {
+				print("@@ setEvent $eventName 함수를 초기화 했습니다")
+				obj.set(eventName, null)
+				arr.reuse()
+			}
+			return arr;
+		}
+		not( fcType.eq('funcRef') ) {		
+			if(fc) print("setEvent 함수타입 오류 (타입:$fcType)")
+			return;
+		}
+		not( typeof(arr,'array') ) {
+			fn=Cf.funcNode(@event.eventChildFunc, target)
+			obj.set(eventName, fn)
+			if(obj!=target) {
+				fn.set('@this', target)
+				fn.set("sender",obj)
+			}
+		}
+		not(typeof(fn,'func')) {
+			return print('setEvent 등록오류 ', eventName)
+		}
+		
+		if(arr.find(fc)) {
+			print("@@ setEvent ${obj.tag} ${eventName} 이미 추가된 함수")
+		} else {
+			print("@@ setEvent ${obj.tag} ${eventName} 이벤트함수 추가")
 			fn.addFuncSrc(fc)
 		}
 		return fn;

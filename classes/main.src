@@ -8,6 +8,10 @@
 	include('classes/common/string.js')
 	include('classes/common/utils.js')
 	include('classes/common/page.js')
+	include('classes/common/draw.js')
+	include('classes/common/etc.js')
+	include('classes/common/process.js')
+	
 	Cf.debug(true, "data/logs")
 	include('classes/apps/sourceRun.html')
 	page = page('sourceRun:main')
