@@ -1,3 +1,4 @@
+<script>
 left(&str, sep) {
 	not(sep) sep=',';
 	return str.findPos(sep).trim();
@@ -12,7 +13,6 @@ nextLine(&s) {
 	not(s.ch()) return;
 	return s.findPos("\n").trim()
 }
-
 
 ff(&s) {
 	fn=Cf.funcNode('parent')
@@ -642,3 +642,4 @@ jsStringValue(&src, single) {
 		return rst;
 	};
 }	
+</script>

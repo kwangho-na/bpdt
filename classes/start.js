@@ -357,6 +357,8 @@ parseSource(&s, base, subName) {
 				}
 				conf("${tag}.${pageBase}:${id}", ss, true)
 			}
+		} else if( tag.eq('example') ) {
+			print("[사용예제]", ss)
 		} else {
 			print("parseSource 오류 태그 $tag 가 정의되지 않았습니다")
 		}

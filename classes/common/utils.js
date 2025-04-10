@@ -49,9 +49,9 @@
 		}
 		
 		if(arr.find(fc)) {
-			print("@@ setEvent ${target.tag} ${eventName} 이미 추가된 함수")
+			print("@@ setEvent ${target.tag} 이미 추가된 콜백함수")
 		} else {
-			print("@@ setEvent ${target.tag} ${eventName} 이벤트함수 추가")
+			print("@@ setEvent ${target.tag} 콜백함수 추가")
 			fn.addFuncSrc(fc)
 		}
 		return fn;		
@@ -157,7 +157,18 @@
 	recalc(total, info) {
 		return _arr().recalc(total, info)
 	}
-	
+	stripTag(&s) {
+		not(s.find('<')) return s;
+		result=''
+		while(s.valid(), n) {
+			ss=s.findPos('<')
+			if(n) result.add(' ')
+			result.add(ss.trim())
+			not(s.ch()) break;
+			s.findPos('>')
+		}
+		return result;
+	}
 	marginRect(rc, param) {
 		not(typeof(param,'array')) {
 			param=args(1)
@@ -293,7 +304,28 @@
 배열/노드처리 공통함수
 */
 <script>
-
+	copyNode(src, dest) {
+		dest.reuse()
+		while(k,src.keys()) {
+			dest.set(k,src.get(k))
+		}
+	}
+	copyArray(src, dest) {
+		dest.reuse()
+		while(c,src) {
+			dest.add(c)
+		}
+	}
+	copyNodeField(src, dest, field) {
+		a=src.get(field)
+		if(typeof(a,'node')) { 
+			copyNode(a,dest.addNode(field))
+		} else if(typeof(a,'array')) {
+			copyArray(a,dest.addArray(field))
+		} else {
+			dest.set(field,a)
+		}
+	}
 	findField(root, field, val) {
 		while( cur, root ) {
 			if( cur.cmp(field, val) ) return cur;

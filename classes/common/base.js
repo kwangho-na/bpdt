@@ -1,4 +1,55 @@
 <script>
+	cmd(name) {		
+		not(name) name='cmd'
+		obj = _node("process.$name")
+		if(obj.var(useModule)) {
+			return obj;
+		}
+		include('classes/common/process.js')
+		return addModule(obj, '@cmd', name)
+	}
+	web(name, callback) {
+		if(typeof(name,'func') ) {
+			callback=name
+			name=null
+		}
+		not(name) name='common'
+		obj = _node("web.$name")
+		if(obj.var(useModule)) {
+			if(typeof(callback,'func')) {
+				obj.member(finishFunc, callback)
+			}
+			return obj;
+		}
+		include('classes/common/process.js')
+		not(callback) callback=null
+		return addModule(obj, '@web', name, callback)
+	}
+	job(name, jobType, callback) {
+		if(typeof(name,'func') ) {
+			callback=name
+			name=null
+		}
+		not(name) name='common'
+		obj = _node("job.$name")		
+		if(obj.var(useModule)) {
+			return obj;
+		}
+		include('classes/common/process.js')
+		return addModule(obj, '@job', name, jobType, callback)
+	}
+	json(name) {
+		not(name) name='common'
+		obj = _node("json.$name")
+		if(obj.var(useModule)) {
+			return obj;
+		}
+		include('classes/common/json.js')
+		return addModule(obj, '@json')
+	}
+</script>
+
+<script>
 	color(param) {
 		if(param.ch('#')) {
 			return Baro.color(param.trim()); 
