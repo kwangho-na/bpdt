@@ -41,6 +41,8 @@ baro project developer tool
 
 [챠트 참조사이트]
     https://echarts.apache.org/examples/en/editor.html?c=line-race
-	
+    
+[주식 참조사이트]
+ https://github.com/hyunyulhenry/quant_py/blob/main/data_korea.ipynb
 	
 	
